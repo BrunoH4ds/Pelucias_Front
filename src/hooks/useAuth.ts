@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { axiosInstance, setAccessToken } from "@/api/Config";
 import { Admin } from "@/types/admin";
 
@@ -8,33 +8,34 @@ export function useAuth() {
   const [accessToken, _setAccessToken] = useState<string | null>(null);
   const [user, setUser] = useState<Admin | null>(null);
 
-  // Atualiza state + axios config
+  // Evita refresh concorrente
+  const isRefreshing = useRef(false);
+  const refreshPromise = useRef<Promise<string | null> | null>(null);
+
   function handleSetAccessToken(token: string | null) {
     _setAccessToken(token);
     if (token) {
-      setAccessToken(token); // atualiza axiosInstance
+      setAccessToken(token);
     } else {
-      setAccessToken(""); // limpa headers
+      setAccessToken("");
     }
   }
 
-  // Login
   async function login(username: string, senha: string) {
     try {
       const res = await axiosInstance.post("/admins/login", { username, senha });
       handleSetAccessToken(res.data.accessToken);
       setUser(res.data.user);
-      // Redirect to dashboard after successful login
       window.location.href = "/qg/dashboard";
     } catch (err: unknown) {
-      const errorMessage = err instanceof Error && 'response' in err 
-        ? (err as { response?: { data?: { erro?: string } } })?.response?.data?.erro 
-        : undefined;
+      const errorMessage =
+        err instanceof Error && "response" in err
+          ? (err as { response?: { data?: { erro?: string } } })?.response?.data?.erro
+          : undefined;
       throw new Error(errorMessage || "Erro ao fazer login");
     }
   }
 
-  // Logout
   async function logout() {
     try {
       await axiosInstance.post("/admins/logout", {}, { withCredentials: true });
@@ -44,36 +45,45 @@ export function useAuth() {
     }
   }
 
-  // Refresh manual
-  const refreshToken = useCallback(async () => {
-    try {
-      const res = await axiosInstance.post(
-        "/admins/refresh",
-        {},
-        { withCredentials: true }
-      );
-      handleSetAccessToken(res.data.accessToken);
-      return res.data.accessToken;
-    } catch {
-      handleSetAccessToken(null);
-      setUser(null);
-      return null;
+  const refreshToken = useCallback(async (): Promise<string | null> => {
+    if (isRefreshing.current && refreshPromise.current) {
+      return refreshPromise.current; // retorna a mesma promise se já estiver rodando
     }
+
+    isRefreshing.current = true;
+    refreshPromise.current = (async () => {
+      try {
+        const res = await axiosInstance.post(
+          "/admins/refresh",
+          {},
+          { withCredentials: true }
+        );
+        handleSetAccessToken(res.data.accessToken);
+        return res.data.accessToken;
+      } catch {
+        handleSetAccessToken(null);
+        setUser(null);
+        return null;
+      } finally {
+        isRefreshing.current = false;
+        refreshPromise.current = null;
+      }
+    })();
+
+    return refreshPromise.current;
   }, []);
 
-  // Try to refresh token on component mount only if we might have a refresh token
+  // Só tenta refresh 1x no mount, nunca em loop
   useEffect(() => {
-    // Only attempt refresh if we're not on the login page and accessToken is null
-    const isLoginPage = window.location.pathname === '/qg/login';
-    if (!accessToken && !isLoginPage) {
+    const isLoginPage = window.location.pathname === "/qg";
+    if (!isLoginPage) {
       refreshToken().catch(() => {
-        // If refresh fails, user is not logged in
         console.log("Refresh token failed, user not logged in");
       });
     }
-  }, [refreshToken]); // Only run once on mount and when refreshToken changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // roda só uma vez no mount
 
-  // Interceptor do axios (já evita duplicar lógica com config.ts)
   useEffect(() => {
     const interceptor = axiosInstance.interceptors.response.use(
       (response) => response,
