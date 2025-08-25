@@ -61,15 +61,17 @@ export function useAuth() {
     }
   }, []);
 
-  // Try to refresh token on component mount if no access token
+  // Try to refresh token on component mount only if we might have a refresh token
   useEffect(() => {
-    if (!accessToken) {
+    // Only attempt refresh if we're not on the login page and accessToken is null
+    const isLoginPage = window.location.pathname === '/qg/login';
+    if (!accessToken && !isLoginPage) {
       refreshToken().catch(() => {
         // If refresh fails, user is not logged in
         console.log("Refresh token failed, user not logged in");
       });
     }
-  }, [refreshToken]); // Removed accessToken from dependencies to prevent infinite loop
+  }, [refreshToken]); // Only run once on mount and when refreshToken changes
 
   // Interceptor do axios (já evita duplicar lógica com config.ts)
   useEffect(() => {
