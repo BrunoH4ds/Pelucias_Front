@@ -9,7 +9,9 @@ import {
 
 export default function InformacoesContato() {
   return (
-    <section className="relative bg-zinc-900 text-white px-6 py-16 overflow-hidden">
+    <section className="relative bg-zinc-900 text-white px-6 py-16 overflow-hidden"
+    style={{ height: "calc(100vh - 350px)" }}
+    >
       {/* Ícones decorativos flutuando ao fundo */}
       <IconMessage2
         className="absolute -translate-y-1/2 -left-6 text-amber-600 opacity-10 animate-spin-slow"
@@ -20,7 +22,7 @@ export default function InformacoesContato() {
         size={300}
       />
 
-      <div className="max-w-4xl mx-auto relative z-10">
+      <div className="flex flex-col justify-center max-w-4xl mx-auto relative z-10 h-full">
         <h2 className="text-3xl font-bold mb-4 text-amber-500">
           Fale Conosco
         </h2>

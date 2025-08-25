@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTasks } from "@/context/TaskContext"; // Usando o contexto
+import { IconTrash } from "@tabler/icons-react";
 
 export const TaskList = () => {
   const { tasks, addTask, removeTask } = useTasks(); // Acessando as funções e as tarefas do contexto
@@ -37,21 +38,21 @@ export const TaskList = () => {
       </div>
 
       {/* Lista de Tarefas */}
-      <ul className="list-disc pl-6 mt-4">
+      <ul className="list-disc mt-4">
         {tasks.length > 0 ? (
           tasks.map((task, index) => (
-            <li key={index} className="flex justify-between items-center my-2">
+            <li key={index} className="bg-zinc-700 border border-zinc-600 p-4 rounded-md text-gray-200 flex items-center justify-between">
               <span className="text-gray-200 font-bold text-lg">{task}</span>
               <button
                 onClick={() => removeTask(task)} // Chama a função do contexto para remover a tarefa
-                className="p-2 rounded-md bg-red-600 ml-4 hover:bg-red-700 cursor-pointer"
+                className="p-2 rounded-md bg-red-600 hover:bg-red-700 cursor-pointer"
               >
-                Remover
+               <IconTrash size={18}/>
               </button>
             </li>
           ))
         ) : (
-          <li className="text-gray-200">Não há tarefas pendentes.</li>
+          <li className="bg-zinc-700 border border-zinc-600 p-4 rounded-md text-gray-200 flex">Não há tarefas pendentes.</li>
         )}
       </ul>
     </div>

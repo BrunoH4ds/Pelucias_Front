@@ -1,12 +1,14 @@
-import { verifyToken } from "@/lib/verifyToken";
+"use client"
+
+import { useCheckAuth } from "@/lib/CheckAuth";
 import SideBar from "@/components/qg/SideBar";
 
-export default async function QgLayout({
+export default function QgLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  await verifyToken(); // Redireciona se não estiver autenticado
+  useCheckAuth();
 
   return (
     <div className="flex flex-col gap-10 md:flex-row flex-1 bg-zinc-800 md:px-10">

@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import type { Noticia } from "@/types/notice";
-import { createNoticia, deleteNoticia } from "../../../../api/NoticiaCrud";
+import { createNoticia, updateNoticia, deleteNoticia } from "../../../api/NoticiaCrud";
 import NewsItem from "./NewsItem";
 import ModalNews from "./ModalNews";
 
@@ -15,6 +15,7 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
   const [noticias, setNoticias] = useState<Noticia[] | null>(initialNoticias);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [selected, setSelected] = useState<Noticia | null>(null);
 
   const filteredNoticias = useMemo(() => {
     if (!noticias) return [];
@@ -30,6 +31,16 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
       );
   }, [search, noticias]);
 
+  const openModalToCreate = () => {
+    setSelected(null);
+    setModalOpen(true);
+  };
+
+  const openModalToEdit = (noticia: Noticia) => {
+    setSelected(noticia);
+    setModalOpen(true);
+  };
+
   const handleCreate = async (data: FormData) => {
     if (!token) return alert("Sem token");
     try {
@@ -39,6 +50,20 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
       window.location.reload();
     } catch {
       alert("Erro ao criar notícia.");
+    }
+  };
+
+  const handleUpdate = async (id: string, data: FormData) => {
+    if (!token) return alert("Sem token");
+    try {
+      const atualizada = await updateNoticia(id, token, data, true);
+      setNoticias(
+        (prev) => prev?.map((n) => (n._id === id ? atualizada : n)) ?? null
+      );
+      setModalOpen(false);
+      window.location.reload();
+    } catch {
+      alert("Erro ao atualizar notícia.");
     }
   };
 
@@ -66,7 +91,7 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
           className="p-2 rounded bg-zinc-700 text-white border border-amber-400/50 w-full max-w-md"
         />
         <button
-          onClick={() => setModalOpen(true)}
+          onClick={openModalToCreate}
           className="ml-4 py-2 px-4 border border-amber-400/50 text-white rounded-md hover:bg-zinc-700 cursor-pointer"
         >
           Adicionar
@@ -79,6 +104,7 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
             <NewsItem
               key={noticia._id}
               noticia={noticia}
+              onEdit={() => openModalToEdit(noticia)}
               onDelete={() => handleDelete(noticia._id)}
             />
           ))
@@ -87,7 +113,14 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
         )}
       </div>
 
-      {modalOpen && <ModalNews onClose={() => setModalOpen(false)} onCreate={handleCreate} />}
+      {modalOpen && (
+        <ModalNews
+          noticia={selected}
+          onClose={() => setModalOpen(false)}
+          onCreate={handleCreate}
+          onUpdate={handleUpdate}
+        />
+      )}
     </div>
   );
 }

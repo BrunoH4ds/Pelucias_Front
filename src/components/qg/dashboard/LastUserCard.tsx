@@ -4,7 +4,7 @@ import type { Admin } from "@/types/admin";
 import { useState, useMemo } from "react";
 import SingleLastUserCard from "./SingleLastUserCard";
 import Modal from "./Modal";
-import { createAdmin, updateAdmin, deleteAdmin } from "../../../../api/AdminCrud";
+import { createAdmin, updateAdmin, deleteAdmin } from "../../../api/AdminCrud";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 
 interface LastUsersCardProps {
@@ -111,20 +111,23 @@ export default function LastUsersCard({
               className="flex justify-between items-center bg-zinc-700 border border-zinc-600 gap-5 p-4 rounded-md"
             >
               <SingleLastUserCard user={user} />
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handleEdit(user)}
-                  className="flex gap-1 items-center text-sm bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md cursor-pointer"
-                >
-                  <IconEdit size={20} />
-                </button>
-                <button
-                  onClick={() => handleDelete(user._id)}
-                  className="flex gap-1 items-center text-sm bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md cursor-pointer"
-                >
-                  <IconTrash size={20} />
-                </button>
-              </div>
+              {/* Hide edit and delete buttons if this is the last admin */}
+              {admins && admins.length > 1 && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(user)}
+                    className="flex gap-1 items-center text-sm bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md cursor-pointer"
+                  >
+                    <IconEdit size={20} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(user._id)}
+                    className="flex gap-1 items-center text-sm bg-red-600 hover:bg-red-700 text-white p-2 rounded-md cursor-pointer"
+                  >
+                    <IconTrash size={20} />
+                  </button>
+                </div>
+              )}
             </div>
           ))
         ) : (

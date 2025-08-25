@@ -51,13 +51,12 @@ export async function deleteAdmin(id: string, token: string): Promise<any> {
   }
 }
 
-export async function loginAdmin(data: { username: string; senha: string }): Promise<string> {
+export async function loginAdmin(data: { username: string; senha: string }) {
   try {
     const res = await axiosInstance.post("/admins/login", data);
-    return res.data.token;
+    return res.data; // contém { accessToken, user }
   } catch (error: any) {
-    throw new Error(
-      error?.response?.data?.erro || "Erro ao fazer login"
-    );
+    throw new Error(error?.response?.data?.erro || "Erro ao fazer login");
   }
 }
+

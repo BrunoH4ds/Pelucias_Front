@@ -20,13 +20,13 @@ export default function ProductItem({ produto, onEdit, onDelete }: ProductItemPr
       <div className="flex gap-2">
         <button
           onClick={onEdit}
-          className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded-md cursor-pointer"
+          className="text-sm bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-md cursor-pointer"
         >
           <IconEdit size={20} />
         </button>
         <button
           onClick={onDelete}
-          className="text-sm bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded-md cursor-pointer"
+          className="text-sm bg-red-600 hover:bg-red-700 text-white p-2 rounded-md cursor-pointer"
         >
           <IconTrash size={18} />
         </button>

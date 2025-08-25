@@ -1,7 +1,7 @@
 import Logo from "../shared/Logo";
 import SearchBar from "../navbar/SeachBar";
 import MenuLinks from "../navbar/MenuLinks";
-import { getAllProdutos } from "../../../api/ProdutosCrud";
+import { getAllProdutos } from "../../api/ProdutosCrud";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,7 @@ export default async function NavBar() {
         <MenuLinks />
 
         {/* Busca + Carrinho */}
-        <SearchBar produtos={produtos}/>
+        <SearchBar produtos={produtos} />
       </div>
     </nav>
   );

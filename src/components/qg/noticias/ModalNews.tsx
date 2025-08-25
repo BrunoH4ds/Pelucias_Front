@@ -1,19 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import type { Noticia } from "@/types/notice";
 
 interface Props {
+  noticia: Noticia | null;
   onClose: () => void;
   onCreate: (data: FormData) => Promise<void>;
+  onUpdate: (id: string, data: FormData) => Promise<void>;
 }
 
-export default function ModalNews({ onClose, onCreate }: Props) {
+export default function ModalNews({ noticia, onClose, onCreate, onUpdate }: Props) {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [imagem, setImagem] = useState<File | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+
+  useEffect(() => {
+    if (noticia) {
+      setIsEditing(true);
+      setTitulo(noticia.titulo || "");
+      setDescricao(noticia.descricao || "");
+    } else {
+      setIsEditing(false);
+      setTitulo("");
+      setDescricao("");
+      setImagem(null);
+    }
+  }, [noticia]);
 
   const handleSubmit = async () => {
-    if (!titulo || !descricao || !imagem) {
+    if (!titulo || !descricao) {
       alert("Preencha todos os campos obrigatórios.");
       return;
     }
@@ -21,20 +38,28 @@ export default function ModalNews({ onClose, onCreate }: Props) {
     const formData = new FormData();
     formData.append("titulo", titulo);
     formData.append("descricao", descricao);
-    formData.append("imagem", imagem);
+    if (imagem) {
+      formData.append("imagem", imagem);
+    }
 
     try {
-      await onCreate(formData);
+      if (isEditing && noticia) {
+        await onUpdate(noticia._id, formData);
+      } else {
+        await onCreate(formData);
+      }
       onClose();
     } catch {
-      alert("Erro ao criar notícia.");
+      alert(isEditing ? "Erro ao atualizar notícia." : "Erro ao criar notícia.");
     }
   };
 
   return (
     <div className="fixed inset-0 bg-zinc-900/50 backdrop-blur-md flex items-center justify-center z-50">
       <div className="bg-zinc-800 p-6 rounded-md border border-amber-400/50 w-full max-w-lg">
-        <h2 className="text-xl font-bold text-white mb-4">Adicionar Notícia</h2>
+        <h2 className="text-xl font-bold text-white mb-4">
+          {isEditing ? "Editar Notícia" : "Adicionar Notícia"}
+        </h2>
 
         <input
           value={titulo}
@@ -67,7 +92,7 @@ export default function ModalNews({ onClose, onCreate }: Props) {
             onClick={handleSubmit}
             className="py-2 px-4 border border-amber-400/50 text-white rounded-md hover:bg-zinc-700 transition cursor-pointer"
           >
-            Criar
+            {isEditing ? "Atualizar" : "Criar"}
           </button>
         </div>
       </div>

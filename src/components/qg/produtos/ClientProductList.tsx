@@ -6,7 +6,7 @@ import {
   createProduto,
   updateProduto,
   deleteProduto,
-} from "../../../../api/ProdutosCrud";
+} from "../../../api/ProdutosCrud";
 import ProductItem from "./ProductItem";
 import ModalProduct from "./ModalProduct";
 

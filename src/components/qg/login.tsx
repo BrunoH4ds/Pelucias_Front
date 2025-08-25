@@ -1,12 +1,12 @@
 // components/qg/login.tsx
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { loginAdmin } from "../../../api/AdminCrud";
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { IconShieldLock } from "@tabler/icons-react";
 import { AnimatedGridPattern } from "../magicui/animated-grid-pattern";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -14,13 +14,22 @@ export default function AdminLogin() {
   const [erro, setErro] = useState("");
   const router = useRouter();
 
+  const { login, accessToken } = useAuth();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (accessToken) {
+      router.push("/qg/dashboard");
+    }
+  }, [accessToken, router]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setErro("");
 
     try {
-      await loginAdmin({ username, senha });
-      router.push("/qg/dashboard");
+      await login(username, senha);
+      // Redirection is now handled in the useAuth hook
     } catch (error) {
       console.error("Erro no login:", error);
       setErro("Usuário ou senha inválidos");
