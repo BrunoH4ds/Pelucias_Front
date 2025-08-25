@@ -13,6 +13,7 @@ export function useCheckAuth() {
     const checkAuth = async () => {
       if (!accessToken) {
         console.log("accessToken não encontrado, tentando refresh...")
+        console.log(accessToken)
         try {
           // Try to refresh the token
           const newToken = await refreshToken();

@@ -105,7 +105,6 @@ export default function AdminHome() {
             </TaskProvider>
 
             <LastUsersCard admins={data?.admins || null} token={accessToken || undefined} />
-            <ClientNewsList initialNoticias={data?.noticias || null} token={accessToken || undefined} />
           </div>
         );
       }}
