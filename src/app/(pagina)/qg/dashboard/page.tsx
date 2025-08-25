@@ -9,7 +9,6 @@ import {
 import StatCard from "@/components/qg/dashboard/StatCard";
 import { TaskList } from "@/components/qg/dashboard/TaskList";
 import LastUsersCard from "@/components/qg/dashboard/LastUserCard";
-import ClientNewsList from "@/components/qg/noticias/ClientNewsList";
 import { TaskProvider } from "@/context/TaskContext";
 import { useAuth } from "@/hooks/useAuth";
 import DataFetcher from "@/components/ui/DataFetcher";
