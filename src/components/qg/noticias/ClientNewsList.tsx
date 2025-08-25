@@ -12,23 +12,18 @@ interface Props {
 }
 
 export default function ClientNewsList({ initialNoticias, token }: Props) {
-  const [noticias, setNoticias] = useState<Noticia[] | null>(initialNoticias);
+  const [noticias, setNoticias] = useState<Noticia[]>(initialNoticias ?? []);
   const [search, setSearch] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [selected, setSelected] = useState<Noticia | null>(null);
 
   const filteredNoticias = useMemo(() => {
-    if (!noticias) return [];
-    return noticias
-      .filter(
-        (noticia): noticia is Noticia =>
-          noticia !== null &&
-          noticia !== undefined &&
-          typeof noticia.titulo === "string"
-      )
-      .filter((noticia) =>
+    return noticias.filter(
+      (noticia) =>
+        noticia &&
+        typeof noticia.titulo === "string" &&
         noticia.titulo.toLowerCase().includes(search.toLowerCase())
-      );
+    );
   }, [search, noticias]);
 
   const openModalToCreate = () => {
@@ -45,9 +40,12 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
     if (!token) return alert("Sem token");
     try {
       const nova = await createNoticia(data, token);
-      setNoticias((prev) => (prev ? [...prev, nova] : [nova]));
-      setModalOpen(false);
-      window.location.reload();
+      if (nova) {
+        setNoticias((prev) => (prev ? [...prev, nova] : [nova]));
+        setModalOpen(false);
+      } else {
+        alert("Erro ao criar notícia: retorno nulo.");
+      }
     } catch {
       alert("Erro ao criar notícia.");
     }
@@ -57,11 +55,14 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
     if (!token) return alert("Sem token");
     try {
       const atualizada = await updateNoticia(id, token, data, true);
-      setNoticias(
-        (prev) => prev?.map((n) => (n._id === id ? atualizada : n)) ?? null
-      );
-      setModalOpen(false);
-      window.location.reload();
+      if (atualizada) {
+        setNoticias((prev) =>
+          prev.map((n) => (n._id === id ? atualizada : n))
+        );
+        setModalOpen(false);
+      } else {
+        alert("Erro ao atualizar notícia: retorno nulo.");
+      }
     } catch {
       alert("Erro ao atualizar notícia.");
     }
@@ -72,8 +73,7 @@ export default function ClientNewsList({ initialNoticias, token }: Props) {
     if (confirm("Remover notícia?")) {
       try {
         await deleteNoticia(id, token);
-        setNoticias((prev) => prev?.filter((n) => n._id !== id) ?? null);
-        window.location.reload();
+        setNoticias((prev) => prev.filter((n) => n._id !== id));
       } catch {
         alert("Erro ao deletar notícia.");
       }

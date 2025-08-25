@@ -9,6 +9,7 @@ import {
 import StatCard from "@/components/qg/dashboard/StatCard";
 import { TaskList } from "@/components/qg/dashboard/TaskList";
 import LastUsersCard from "@/components/qg/dashboard/LastUserCard";
+import ClientNewsList from "@/components/qg/noticias/ClientNewsList";
 import { TaskProvider } from "@/context/TaskContext";
 import { useAuth } from "@/hooks/useAuth";
 import DataFetcher from "@/components/ui/DataFetcher";
@@ -17,10 +18,14 @@ import { getAllAdmins } from "../../../../api/AdminCrud";
 import { getAllProdutos } from "../../../../api/ProdutosCrud";
 import { getAllNoticias } from "../../../../api/NoticiaCrud";
 
+import { Admin } from "@/types/admin";
+import { Produto } from "@/types/product";
+import { Noticia } from "@/types/notice";
+
 interface DashboardData {
-  admins: any[] | null;
-  produtos: any[] | null;
-  noticias: any[] | null;
+  admins: Admin[] | null;
+  produtos: Produto[] | null;
+  noticias: Noticia[] | null;
 }
 
 export default function AdminHome() {
@@ -100,6 +105,7 @@ export default function AdminHome() {
             </TaskProvider>
 
             <LastUsersCard admins={data?.admins || null} token={accessToken || undefined} />
+            <ClientNewsList initialNoticias={data?.noticias || null} token={accessToken || undefined} />
           </div>
         );
       }}

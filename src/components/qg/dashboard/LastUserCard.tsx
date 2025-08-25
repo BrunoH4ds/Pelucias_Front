@@ -58,8 +58,12 @@ export default function LastUsersCard({
     if (!token) return alert("Token não disponível");
     try {
       const novoAdmin = await createAdmin(data, token);
-      setAdmins((prev) => (prev ? [...prev, novoAdmin] : [novoAdmin]));
-      window.location.reload();
+      if (novoAdmin) {
+        setAdmins((prev) => (prev ? [...prev, novoAdmin as Admin] : [novoAdmin as Admin]));
+        window.location.reload();
+      } else {
+        alert("Erro ao criar administrador: retorno nulo");
+      }
     } catch {
       alert("Erro ao criar administrador");
     }
@@ -72,12 +76,16 @@ export default function LastUsersCard({
     if (!token) return alert("Token não disponível");
     try {
       const atualizado = await updateAdmin(id, data, token);
-      setAdmins((prev) =>
-        prev
-          ? prev.map((admin) => (admin._id === id ? atualizado : admin))
-          : null
-      );
-      window.location.reload();
+      if (atualizado) {
+        setAdmins((prev) =>
+          prev
+            ? prev.map((admin) => (admin._id === id ? atualizado as Admin : admin))
+            : null
+        );
+        window.location.reload();
+      } else {
+        alert("Erro ao atualizar administrador: retorno nulo");
+      }
     } catch {
       alert("Erro ao atualizar administrador");
     }

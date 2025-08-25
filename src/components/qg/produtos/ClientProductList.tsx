@@ -44,9 +44,13 @@ export default function ClientProductList({ initialProdutos, token }: Props) {
     if (!token) return alert("Sem token");
     try {
       const novo = await createProduto(form, token);
-      setProdutos((prev) => (prev ? [...prev, novo] : [novo]));
-      setModalOpen(false);
-      window.location.reload();
+      if (novo) {
+        setProdutos((prev) => (prev ? [...prev, novo as Produto] : [novo as Produto]));
+        setModalOpen(false);
+        window.location.reload();
+      } else {
+        alert("Erro ao criar produto: retorno nulo");
+      }
     } catch {
       alert("Erro ao criar produto");
     }
@@ -56,11 +60,15 @@ export default function ClientProductList({ initialProdutos, token }: Props) {
     if (!token) return alert("Sem token");
     try {
       const atualizado = await updateProduto(id, form, token);
-      setProdutos(
-        (prev) => prev?.map((p) => (p._id === id ? atualizado : p)) ?? null
-      );
-      setModalOpen(false);
-      window.location.reload();
+      if (atualizado) {
+        setProdutos(
+          (prev) => prev?.map((p) => (p._id === id ? atualizado as Produto : p)) ?? null
+        );
+        setModalOpen(false);
+        window.location.reload();
+      } else {
+        alert("Erro ao atualizar produto: retorno nulo");
+      }
     } catch {
       alert("Erro ao atualizar produto");
     }

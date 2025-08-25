@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { axiosInstance, setAccessToken } from "@/api/Config";
+import { Admin } from "@/types/admin";
 
 export function useAuth() {
   const [accessToken, _setAccessToken] = useState<string | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<Admin | null>(null);
 
   // Atualiza state + axios config
   function handleSetAccessToken(token: string | null) {
@@ -25,8 +26,11 @@ export function useAuth() {
       setUser(res.data.user);
       // Redirect to dashboard after successful login
       window.location.href = "/qg/dashboard";
-    } catch (err: any) {
-      throw new Error(err?.response?.data?.erro || "Erro ao fazer login");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error && 'response' in err 
+        ? (err as { response?: { data?: { erro?: string } } })?.response?.data?.erro 
+        : undefined;
+      throw new Error(errorMessage || "Erro ao fazer login");
     }
   }
 
@@ -41,7 +45,7 @@ export function useAuth() {
   }
 
   // Refresh manual
-  async function refreshToken() {
+  const refreshToken = useCallback(async () => {
     try {
       const res = await axiosInstance.post(
         "/admins/refresh",
@@ -55,7 +59,7 @@ export function useAuth() {
       setUser(null);
       return null;
     }
-  }
+  }, []);
 
   // Try to refresh token on component mount if no access token
   useEffect(() => {
@@ -65,7 +69,7 @@ export function useAuth() {
         console.log("Refresh token failed, user not logged in");
       });
     }
-  }, []);
+  }, [accessToken, refreshToken]);
 
   // Interceptor do axios (já evita duplicar lógica com config.ts)
   useEffect(() => {
@@ -86,7 +90,7 @@ export function useAuth() {
     );
 
     return () => axiosInstance.interceptors.response.eject(interceptor);
-  }, []);
+  }, [refreshToken]);
 
   return { accessToken, user, login, logout, refreshToken };
 }

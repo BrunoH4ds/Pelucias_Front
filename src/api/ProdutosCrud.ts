@@ -24,7 +24,7 @@ export async function getProdutoById(id: string): Promise<Produto | null> {
 export async function createProduto(
   data: FormData,
   token: string
-): Promise<any> {
+): Promise<Produto | null> {
   try {
     const res = await axiosInstance.post("/produtos", data, {
       ...getAuthHeaders(token),
@@ -44,7 +44,7 @@ export async function updateProduto(
   id: string,
   data: FormData,
   token: string
-): Promise<any> {
+): Promise<Produto | null> {
   try {
     const res = await axiosInstance.put(`/produtos/${id}`, data, {
       ...getAuthHeaders(token),
@@ -60,12 +60,12 @@ export async function updateProduto(
   }
 }
 
-export async function deleteProduto(id: string, token: string): Promise<any> {
+export async function deleteProduto(id: string, token: string): Promise<boolean> {
   try {
-    const res = await axiosInstance.delete(`/produtos/${id}`, getAuthHeaders(token));
-    return res.data;
+    await axiosInstance.delete(`/produtos/${id}`, getAuthHeaders(token));
+    return true;
   } catch (error) {
     console.error("Erro ao deletar produto:", error);
-    return null;
+    return false;
   }
 }

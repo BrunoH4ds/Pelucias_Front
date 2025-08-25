@@ -24,7 +24,7 @@ export async function getNoticiaById(id: string): Promise<Noticia | null> {
 export async function createNoticia(
   data: FormData,
   token: string
-): Promise<any> {
+): Promise<Noticia | null> {
   try {
     const res = await axiosInstance.post("/noticias/", data, {
       ...getAuthHeaders(token),
@@ -45,7 +45,7 @@ export async function updateNoticia(
   token: string,
   data: FormData | object,
   hasImage: boolean = false
-): Promise<any> {
+): Promise<Noticia | null> {
   try {
     const headers = {
       ...getAuthHeaders(token).headers,
@@ -63,13 +63,13 @@ export async function updateNoticia(
   }
 }
 
-export async function deleteNoticia(id: string, token: string) {
+export async function deleteNoticia(id: string, token: string): Promise<boolean> {
   try {
-    const res = await axiosInstance.delete(`/noticias/${id}`, getAuthHeaders(token));
-    return res.data;
+    await axiosInstance.delete(`/noticias/${id}`, getAuthHeaders(token));
+    return true;
   } catch (error) {
     console.error("Erro ao deletar notícia:", error);
-    return null;
+    return false;
   }
 }
 

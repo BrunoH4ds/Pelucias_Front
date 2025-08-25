@@ -20,7 +20,7 @@ export function useCheckAuth() {
             console.log("Refresh falhou, redirecionando para login")
             router.push("/qg"); // redireciona se não estiver logado
           }
-        } catch (error) {
+        } catch {
           console.log("Erro ao tentar refresh, redirecionando para login")
           router.push("/qg"); // redireciona se não estiver logado
         }
