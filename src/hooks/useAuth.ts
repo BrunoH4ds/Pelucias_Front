@@ -69,7 +69,7 @@ export function useAuth() {
         console.log("Refresh token failed, user not logged in");
       });
     }
-  }, [accessToken, refreshToken]);
+  }, [refreshToken]); // Removed accessToken from dependencies to prevent infinite loop
 
   // Interceptor do axios (já evita duplicar lógica com config.ts)
   useEffect(() => {
